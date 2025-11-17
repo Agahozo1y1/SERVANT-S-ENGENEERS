@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Servant’s Engineer</title>
+<style>
+:root {
+  --accent: #8f7adb;
+  --bg: #07172c;
+  --card: rgba(40, 6, 6, 0.6);
+  --text: #fff;
+}
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+}
+body {
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+
+/* Header */
+header {
+  background: rgba(185, 179, 179, 0.6);
+  backdrop-filter: blur(8px);
+  color: var(--accent);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1em 1.5em;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 0 10px rgba(0, 210, 189, 0.3);
+}
+.logo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.logo-circle {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  object-fit: cover;
+  box-shadow: 0 0 10px var(--accent);
+}
+.menu-btn {
+  background:grey;
+  border: none;
+  color: green;
+  font-size: 1.8em;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.menu-btn:hover { transform: scale(1.2); }
+
+/* Sidebar Menu */
+.menu {
+  position: fixed;
+  top: 0;
+  right: -300px;
+  height: 100%;
+  width: 250px;
+  background: rgba(10,10,10,0.95);
+  backdrop-filter: blur(10px);
+  display: flex;
+  flex-direction: column;
+  padding: 2em 1em;
+  transition: right 0.3s ease-in-out;
+  z-index: 9999;
+}
+.menu.open { right: 0; }
+.menu button {
+  background: var(--accent);
+  color: #000;
+  border: none;
+  padding: 0.8em;
+  margin: 0.5em 0;
+  border-radius: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.menu button:hover { background: #00c2ad; }
+
+/* Hero Section */
+.hero {
+  text-align: center;
+  padding: 4em 1.5em;
+  animation: fadeIn 1.2s ease;
+}
+.hero h2 {
+  color: var(--accent);
+  font-size: 2.5em;
+  margin-bottom: 0.3em;
+  text-shadow: 0 0 10px var(--accent);
+}
+.hero p {
+  color: #bbb;
+  max-width: 700px;
+  margin: 0 auto 2em;
+  font-size: 1.2em;
+}
+.hero button {
+  margin: 0.5em;
+  background: var(--accent);
+  color: #000;
+  border: none;
+  padding: 0.8em 1.6em;
+  border-radius: 50px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+}
+.hero button:hover {
+  transform: scale(1.05);
+  background: #00c2ad;
+}
+
+/* Calculator */
+.calculator {
+  display: none;
+  margin: 3em auto;
+  background: var(--card);
+  backdrop-filter: blur(15px);
+  padding: 1.2em;
+  border-radius: 20px;
+  max-width: 400px;
+  box-shadow: 0 0 25px rgba(0,255,231,0.15);
+}
+display {
+  width: 100%;
+  padding: 1em;
+  font-size: 1.5em;
+  text-align: right;
+  border: none;
+  border-radius: 10px;
+  background: #000;
+  color: var(--accent);
+  margin-bottom: 1em;
+}
+.keys {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+.keys button {
+  background: rgba(255,255,255,0.1);
+  color: var(--text);
+  border: none;
+  padding: 1em;
+  border-radius: 10px;
+  font-size: 1.2em;
+  transition: background 0.2s;
+}
+.keys button:hover {
+  background: var(--accent);
+  color: #000;
+}
+
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  backdrop-filter: blur(6px);
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+.modal-content {
+  background: rgba(20,20,20,0.9);
+  padding: 2em;
+  border-radius: 20px;
+  box-shadow: 0 0 25px var(--accent);
+  color: #fff;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+}
+.modal-content a {
+  color: var(--accent);
+  display: block;
+  margin: 0.4em 0;
+  text-decoration: none;
+}
+.modal-content button {
+  margin-top: 1em;
+  background: var(--accent);
+  color: #000;
+  border: none;
+  padding: 0.8em 1.2em;
+  border-radius: 10px;
+  font-weight: bold;
+}
+.modal-content button:hover { background: #00c2ad; }
+
+/* Floating Home Button */
+.home-float {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: var(--accent);
+  color: #000;
+  border: none;
+  border-radius: 50%;
+  font-size: 1.5em;
+  padding: 0.5em 0.6em;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(0,255,231,0.4);
+  transition: transform 0.2s, background 0.2s;
+  z-index: 9999;
+}
+.home-float:hover {
+  transform: scale(1.1);
+  background: #00c2ad;
+}
+
+/* AI Chatbox */
+
+#chatContainer {
+      width: 95%;
+      max-width: 450px;
+      height: 500px;
+      background: var(--card);
+      border-radius: 20px;
+      box-shadow: 0 0 15px var(--accent);
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+      overflow: hidden;
+    }
+
+    #chatMessages {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+    }
+
+    #chatMessages p {
+      margin: 8px 0;
+      line-height: 1.4;
+    }
+
+    #inputContainer {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    #aiInput {
+      flex: 1;
+      padding: 10px;
+      border-radius: 12px;
+      border: none;
+      outline: none;
+      font-size: 16px;
+    }
+
+    button {
+      background: var(--accent);
+      color: black;
+      border: none;
+      border-radius: 12px;
+      padding: 10px 15px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    button:hover {
+      background: white;
+    }
+
+    .math-buttons {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin: 10px 0;
+    }
+
+    .math-buttons button {
+      padding: 10px;
+      font-size: 16px;
+    }
+
+    /* Auth Boxes */
+.auth-box {
+  max-width: 380px;
+  width: 90%;
+  backdrop-filter: blur(12px);
+  background: rgba(15, 15, 15, 0.9);
+  border: 1px solid rgba(0,255,231,0.3);
+  box-shadow: 0 0 25px rgba(0,255,231,0.2);
+  padding: 2em;
+  border-radius: 20px;
+  animation: popIn 0.4s ease;
+}
+.auth-box input {
+  width: 100%;
+  margin: 0.5em 0;
+  padding: 0.9em;
+  border: 1px solid rgba(0,255,231,0.4);
+  border-radius: 10px;
+  background: rgba(0,0,0,0.7);
+  color: var(--accent);
+  font-size: 1em;
+  outline: none;
+  transition: border 0.3s, box-shadow 0.3s;
+}
+.auth-box input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 10px rgba(0,255,231,0.4);
+}
+.auth-box a {
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: bold;
+}
+.auth-box a:hover { text-decoration: underline; }
+.remember {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.9em;
+  color: #ccc;
+  margin: 0.5em 0;
+}
+.toggle-pass {
+  cursor: pointer;
+  color: var(--accent);
+  font-size: 0.9em;
+  margin-left: 5px;
+}
+@keyframes popIn {
+  from { transform: scale(0.8); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 2em;
+  color: #00ffe7;
+  font-size: 0.9em;
+}
+@keyframes fadeIn {
+  from {opacity: 0; transform: translateY(20px);}
+  to {opacity: 1; transform: translateY(0);}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo-container">
+    <img src="bloody.png" alt="Servant’s Engineer Logo" class="logo-circle">
+    <h1 style="font-size: 1.2em; color: var(--accent); margin-top: 0.5em;">Servant’s Engineer</h1>
+  </div>
+  <button class="menu-btn" onclick="toggleMenu()">☰</button>
+</header>
+
+<!-- MENU -->
+<div class="menu" id="menu">
+  <button onclick="goHome()">🏠 Home</button>
+  <button onclick="openModal('shareModal')">Share</button>
+  <button onclick="openModal('contactModal')">Contact</button>
+  <button onclick="openModal('aboutModal')">About Us</button>
+  <button onclick="openModal('settingsModal')">Settings</button>
+   <button onclick="openModal('loginModal')">Login</button>
+  <button onclick="openModal('signupModal')">Sign Up</button>
+</div>
+
+<!-- HERO -->
+<section class="hero">
+  <h2 id="title">Work Together, Rise Together</h2>
+  <p id="desc">At Servant’s Engineer, we build and grow as one team, faster, smarter, better.</p>
+  <button onclick="showCalculator('standard')">Standard Calculator</button>
+  <button onclick="showCalculator('scientific')">Scientific Calculator</button>
+  <button onclick="openModal('aiModal')">AI Assistant 🤖</button>
+</section>
+
+<!-- CALCULATOR -->
+<div class="calculator" id="calculator">
+  <input type="text" id="display" disabled>
+  <div class="keys" id="keys"></div>
+</div>
+
+<!-- AI MODAL -->
+
+  <div class="modal"id="aiModal">
+    <div class="modal-content">
+      <h1>🧮 Aura AI</h1>
+      <div class="Chatbox">
+      <div class="Chat-messages" id="chatMessages">
+      <p><b>Aura 🤖:</b> Hello sir 👋<div class=""></div>How can i help you today?</p>
+    </div>
+
+    <div class="chat-input">
+      <input type="text" id="aiInput" placeholder="type your Messages..."/>
+<button onclick="sendAI()">SEND</button>
+    </div>
+</div>
+<button onclick="closeModal('aiModal')">CLOSE</button>
+    </div>
+  </div>
+<!-- CONTACT MODAL -->
+<div class="modal" id="contactModal">
+  <div class="modal-content">
+    <h2>Contact Us</h2>
+    <a href="tel:+250739090081">📞 Call: +250739090081</a>
+    <a href="https://wa.me/250739090081" target="_blank">💬 WhatsApp Us</a>
+    <button onclick="closeModal('contactModal')">Close</button>
+  </div>
+</div>
+
+<!-- ABOUT MODAL -->
+<div class="modal" id="aboutModal">
+  <div class="modal-content">
+    <h2>About Us</h2>
+    <p>Servant’s Engineer — Engineering & AI Innovation Lab and Programming.</p>
+    <p>CEO: <b>Salim Bin Mohammed Asif</b></p>
+    <p>VICE PRESIDENT: <b>Keza Lucie</b></p>
+    <p>ASSISTANT: <b>Nishimwe Carine</b></p>
+    <p>SECRETARY: <b>Agahozo Annelise</b></p>
+    <p>Location: ESSJT, Rwanda</p>
+    <p>We craft cutting-edge apps, AI tools, and web solutions to empower the future.</p>
+    <button onclick="closeModal('aboutModal')">Close</button>
+  </div>
+</div>
+<!-- LOGIN -->
+<div class="modal" id="loginModal">
+  <div class="modal-content auth-box">
+    <h2>Login</h2>
+    <input type="text" id="loginUser" placeholder="Username or Email" />
+    <div style="position:relative;">
+      <input type="password" id="loginPass" placeholder="Password" />
+      <span class="toggle-pass" onclick="togglePass('loginPass',this)">👁</span>
+    </div>
+    <div>rememberMe</div>
+      <label><input type="checkbox" id="rememberMe"> Remember Me</label>
+    </div>
+    <button onclick="login()">Login</button>
+    <p>Don’t have an account? <a href="#" onclick="switchModal('loginModal','signupModal')">Sign Up</a></p>
+  </div>
+    <button onclick="closeModal('loginModal')">Close</button>
+</div>
+
+<!-- SHARE MODAL -->
+<div class="modal" id="shareModal">
+  <div class="modal-content">
+    <h2>Share This</h2>
+    <a href="https://facebook.com/sharer/sharer.php?u=https://yourwebsite.com" target="_blank">Facebook</a>
+    <a href="https://x.com/intent/tweet?url=https://yourwebsite.com" target="_blank">X (Twitter)</a>
+    <a href="https://www.instagram.com/" target="_blank">Instagram</a>
+    <a href="https://www.youtube.com/" target="_blank">YouTube</a>
+    <a href="https://linkedin.com/shareArticle?mini=true&url=https://yourwebsite.com" target="_blank">LinkedIn</a>
+    <a href="https://api.whatsapp.com/send?text=Check+this+out:+https://yourwebsite.com" target="_blank">WhatsApp</a>
+    <button onclick="closeModal('shareModal')">Close</button>
+  </div>
+</div>
+
+<!-- SIGN-UP -->
+<div class="modal" id="signupModal">
+  <div class="modal-content auth-box">
+    <h2>Create Account</h2>
+    <input type="text" id="signUser" placeholder="Username" />
+    <input type="email" id="signEmail" placeholder="Email" />
+    <div style="position:relative;">
+      <input type="password" id="signPass" placeholder="Password" />
+      <span class="toggle-pass" onclick="togglePass('signPass',this)">👁</span>
+    </div>
+    <button onclick="signup()">Sign Up</button>
+    <p>Already have an account? <a href="#" onclick="switchModal('signupModal','loginModal')">Login</a></p>
+    <button onclick="closeModal('signupModal')">Close</button>
+  </div>
+</div>
+
+<!-- SETTINGS MODAL -->
+<div class="modal" id="settingsModal">
+  <div class="modal-content">
+    <h2>Settings</h2>
+    <label>🌐 Language:
+      <select onchange="changeLang(this.value)">
+        <option value="en">English</option>
+        <option value="ar">Arabic</option>
+        <option value="fr">French</option>
+        <option value="sw">Swahili</option>
+        <option value="es">Spanish</option>
+        <option value="de">German</option>
+        <option value="zh">Chinese</option>
+        <option value="ja">Japanese</option>
+        <option value="kiny">kinyarwanda</option>
+      </select>
+    </label>
+    <button onclick="closeModal('settingsModal')">Close</button>
+  </div>
+</div>
+
+<footer>© 2025 Servant’s Engineer. All rights reserved.</footer>
+<button class="home-float" onclick="goHome()">🏠</button>
+
+<script>
+function toggleMenu() {
+  document.getElementById('menu').classList.toggle('open');
+}
+function openModal(id) {
+  document.getElementById(id).style.display = 'flex';
+  document.getElementById('menu').classList.remove('open');
+}
+function closeModal(id) {
+  document.getElementById(id).style.display = 'none';
+}
+function goHome() {
+  document.querySelectorAll('.modal').forEach(m => m.style.display = 'none');
+  document.getElementById('calculator').style.display = 'none';
+  document.getElementById('menu').classList.remove('open');
+  document.querySelector('.hero').scrollIntoView({ behavior: 'smooth' });
+}
+
+/* Calculator */
+const display = document.getElementById('display');
+const keyContainer = document.getElementById('keys');
+function showCalculator(type) {
+  document.getElementById('calculator').style.display = 'block';
+  keyContainer.innerHTML = '';
+  const standard = ['7','8','9','/','4','5','6','*','1','2','3','-','0','00','.','=','+','C'];
+  const scientific = ['sin','cos','tan','log','sqrt','^','(',')',...standard];
+  const keys = type === 'scientific' ? scientific : standard;
+  keys.forEach(k => {
+    const btn = document.createElement('button');
+    btn.textContent = k;
+    btn.onclick = () => handleKey(k);
+    keyContainer.appendChild(btn);
+  });
+}
+function handleKey(k) {
+  if (k === 'C') display.value = '';
+  else if (k === '=') {
+    try { display.value = eval(display.value.replace('^','')); }
+    catch { display.value = 'Error'; }
+  } else if (['sin','cos','tan','log','sqrt'].includes(k)) {
+    const val = parseFloat(display.value || 0);
+    let result = 0;
+    if (k==='sin') result=Math.sin(val);
+    if (k==='cos') result=Math.cos(val);
+    if (k==='tan') result=Math.tan(val);
+    if (k==='log') result=Math.log10(val);
+    if (k==='sqrt') result=Math.sqrt(val);
+    display.value=result;
+  } else display.value += k;
+}
+
+/* AI Chat (Simple Local Response) */
+
+function insertSymbol(symbol) {
+      const input = document.getElementById('aiInput');
+      input.value += symbol;
+      input.focus();
+    }
+
+    function sendAI() {
+      const input = document.getElementById('aiInput');
+      const chat = document.getElementById('chatMessages');
+      const msg = input.value.trim();
+      if (!msg) return;
+
+      chat.innerHTML += `<p><b>You:</b> ${msg}</p>`;
+      input.value = '';
+
+      setTimeout(() => {
+        let response = '';
+        try {
+          let expr = msg
+            .replace(/√/g, 'Math.sqrt')
+            .replace(/\^/g, '**')
+            .replace(/sin/gi, 'Math.sin')
+            .replace(/cos/gi, 'Math.cos')
+            .replace(/tan/gi, 'Math.tan')
+            .replace(/log/gi, 'Math.log10')
+            .replace(/pi/gi, 'Math.PI')
+            .replace(/e/gi, 'Math.E');
+
+          if (/^[0-9+\-*/().\s^√sincotagleMathPIE]*$/i.test(expr)) {
+            let result = Function(`"use strict"; return (${expr})`)();
+            if (isNaN(result) || result === undefined) throw new Error("Invalid");
+            response = `Aura 🤖: The answer is <b>${result}</b>`;
+          } else {
+            response = "Aura 🤖: Sorry, I can only solve simple math problems.";
+          }
+        } catch {
+          response = "Aura 🤖: That’s not a valid math expression.";
+        }
+
+        chat.innerHTML += `<p>${response}</p>`;
+        chat.scrollTop = chat.scrollHeight;
+      }, 500);
+    }
+
+    /* Login/SignUp */
+function switchModal(c,o){closeModal(c);setTimeout(()=>openModal(o),200);}
+function togglePass(id,el){const f=document.getElementById(id);if(f.type==='password'){f.type='text';el.textContent='🙈';}else{f.type='password';el.textContent='👁';}}
+function login(){const u=document.getElementById('loginUser').value.trim();const p=document.getElementById('loginPass').value.trim();if(u&&p){alert(`Welcome back, ${u}!`);closeModal('loginModal');}else alert('Please fill both fields.');}
+function signup(){const u=document.getElementById('signUser').value.trim();const e=document.getElementById('signEmail').value.trim();const p=document.getElementById('signPass').value.trim();if(u&&e&&p){alert(`Account created for ${u}!`);switchModal('signupModal','loginModal');}else alert('Fill all fields.');}
+
+/* Language Switch */
+function changeLang(lang) {
+  const t = document.getElementById('title');
+  const d = document.getElementById('desc');
+  const texts = {
+    en:["Work Together, Rise Together","At Servant’s Engineer, we build and grow as one team, faster, smarter, better."],
+    ar:["اعملوا معًا وارتقوا معًا","في Servant’s Engineer، نبني وننمو كفريق واحد بسرعة وذكاء."],
+    fr:["Travaillez ensemble, grandissez ensemble","Chez Servant’s Engineer, nous construisons et évoluons ensemble."],
+    sw:["Fanya kazi pamoja, panda pamoja","Katika Servant’s Engineer, tunakua kama timu moja kwa kasi na hekima."],
+    es:["Trabaja juntos, crece juntos","En Servant’s Engineer, construimos y crecemos como un solo equipo."],
+    de:["Arbeitet zusammen, wachst zusammen","Bei Servant’s Engineer wachsen wir gemeinsam als Team."],
+    zh:["一起工作，一起成长","在Servant’s Engineer，我们团结成长。"],
+  kiny:["Dukorera hamwe, Tukazamukira rimwe","Muri Servant's Engineer, Twubakira hamwe kandi tuzamukira rimwe nki ikipe, vuba kandi  neza."],
+  ja:["一緒に働き、一緒に成長しよう","Servant’s Engineerでは、私たちは団結して共に成長します。"],
+  };
+  if (texts[lang]) { t.textContent = texts[lang][0]; d.textContent = texts[lang][1]; }
+}
+</script>
+</body>
+</html> make more impressive
